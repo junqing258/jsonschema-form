@@ -69,7 +69,7 @@ export default function FieldTemplate<
       uiSchema={uiSchema}
       registry={registry}
     >
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-1">
         {displayLabel && !isCheckbox && (
           <label
             className={cn(

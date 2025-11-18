@@ -9,7 +9,7 @@ import {
   RJSFSchema,
   StrictRJSFSchema,
   titleId,
-} from '@rjsf/utils';
+} from '@rjsf/utils'
 
 /** The `ObjectFieldTemplate` is the template to use to render all the inner properties of an object along with the
  * title and description if available. If the object is expandable, then an `AddButton` is also rendered after all
@@ -20,7 +20,7 @@ import {
 export default function ObjectFieldTemplate<
   T = any,
   S extends StrictRJSFSchema = RJSFSchema,
-  F extends FormContextType = any,
+  F extends FormContextType = any
 >({
   description,
   title,
@@ -36,18 +36,22 @@ export default function ObjectFieldTemplate<
   readonly,
   registry,
 }: ObjectFieldTemplateProps<T, S, F>) {
-  const uiOptions = getUiOptions<T, S, F>(uiSchema);
-  const TitleFieldTemplate = getTemplate<'TitleFieldTemplate', T, S, F>('TitleFieldTemplate', registry, uiOptions);
+  const uiOptions = getUiOptions<T, S, F>(uiSchema)
+  const TitleFieldTemplate = getTemplate<'TitleFieldTemplate', T, S, F>(
+    'TitleFieldTemplate',
+    registry,
+    uiOptions
+  )
   const DescriptionFieldTemplate = getTemplate<'DescriptionFieldTemplate', T, S, F>(
     'DescriptionFieldTemplate',
     registry,
-    uiOptions,
-  );
-  const showOptionalDataControlInTitle = !readonly && !disabled;
+    uiOptions
+  )
+  const showOptionalDataControlInTitle = !readonly && !disabled
   // Button templates are not overridden in the uiSchema
   const {
     ButtonTemplates: { AddButton },
-  } = registry.templates;
+  } = registry.templates
   return (
     <>
       {title && (
@@ -70,20 +74,20 @@ export default function ObjectFieldTemplate<
           registry={registry}
         />
       )}
-      <div className='flex flex-col gap-2'>
+      <div className="flex flex-col gap-6">
         {!showOptionalDataControlInTitle ? optionalDataControl : undefined}
         {properties.map((element: any, index: number) => (
           <div key={index} className={`${element.hidden ? 'hidden' : ''} flex`}>
-            <div className='w-full'>{element.content}</div>
+            <div className="w-full">{element.content}</div>
           </div>
         ))}
         {canExpand(schema, uiSchema, formData) ? (
-          <div className='mt-2 flex justify-end'>
+          <div className="mt-2 flex justify-end">
             <AddButton
               id={buttonId(fieldPathId, 'add')}
               onClick={onAddProperty}
               disabled={disabled || readonly}
-              className='rjsf-object-property-expand'
+              className="rjsf-object-property-expand"
               uiSchema={uiSchema}
               registry={registry}
             />
@@ -91,5 +95,5 @@ export default function ObjectFieldTemplate<
         ) : null}
       </div>
     </>
-  );
+  )
 }
