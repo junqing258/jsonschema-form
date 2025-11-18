@@ -228,6 +228,7 @@ export default function FormBuilderV2Page() {
   // const [liveValidate, setLiveValidate] = useState(true)
   const [newFieldType, setNewFieldType] = useState<FieldType>('text')
   const [newLabel, setNewLabel] = useState('新字段')
+  const [newFieldKey, setNewFieldKey] = useState('')
 
   const [draggingType, setDraggingType] = useState<FieldType | null>(null)
   const [draggingId, setDraggingId] = useState<string | null>(null)
@@ -273,8 +274,9 @@ export default function FormBuilderV2Page() {
   }
 
   const handleCustomAdd = () => {
+    const base = newFieldKey || newLabel || newFieldType
     const key = createFieldKey(
-      newLabel || newFieldType,
+      base,
       fields.reduce((acc, item) => ({ ...acc, [item.key]: true }), {})
     )
     const field: FieldConfig = {
@@ -283,11 +285,13 @@ export default function FormBuilderV2Page() {
       label: newLabel || TYPE_LABELS[newFieldType],
       type: newFieldType,
       required: true,
+      description: '',
       defaultValue: newFieldType === 'number' ? 0 : newFieldType === 'switch' ? false : '',
       options: newFieldType === 'select' ? ['选项一', '选项二'] : undefined,
     }
     setFields((prev) => [...prev, field])
     setOpenFields((prev) => ({ ...prev, [field.id]: false }))
+    setNewFieldKey('')
     toast.success(`新增字段：${field.label}`)
   }
 
@@ -307,6 +311,7 @@ export default function FormBuilderV2Page() {
   const handleReset = () => {
     setFields(PRESET_FIELDS)
     setFormData(buildArtifacts(PRESET_FIELDS, {}).formData)
+    setNewFieldKey('')
     toast.success('已恢复默认模板')
   }
 
@@ -438,12 +443,6 @@ export default function FormBuilderV2Page() {
 
           <div className="space-y-6">
             <Card>
-              <CardHeader className="space-y-2">
-                <CardTitle>字段画布</CardTitle>
-                <CardDescription>
-                  调整标签、占位、必填与选项，自动生成 schema 与 uiSchema
-                </CardDescription>
-              </CardHeader>
               <CardContent
                 className="space-y-4"
                 onDragOver={(event) => {
@@ -457,6 +456,44 @@ export default function FormBuilderV2Page() {
                   }
                 }}
               >
+                <div className="rounded-lg border border-dashed border-primary/30 bg-muted/20 p-4">
+                  <p className="text-sm font-medium">字段配置</p>
+                  <p className="text-xs text-muted-foreground">
+                    设置字段 Key、描述与类型，创建后可在下方继续调整。
+                  </p>
+                  <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                    <Input
+                      placeholder="字段标签，如：审批备注"
+                      value={newLabel}
+                      onChange={(e) => setNewLabel(e.target.value)}
+                    />
+                    <Input
+                      placeholder="字段 key，例如 owner_email"
+                      value={newFieldKey}
+                      onChange={(e) => setNewFieldKey(e.target.value.replace(/\s+/g, '_'))}
+                    />
+                    <Select
+                      onValueChange={(value) => setNewFieldType(value as FieldType)}
+                      value={newFieldType}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="字段类型" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {(Object.keys(TYPE_LABELS) as FieldType[]).map((type) => (
+                          <SelectItem key={type} value={type}>
+                            {TYPE_LABELS[type]}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button type="button" className="gap-1" onClick={handleCustomAdd}>
+                      <Wand2 className="h-4 w-4" />
+                      插入字段
+                    </Button>
+                  </div>
+                </div>
+
                 {fields.map((field, index) => {
                   const isOpen = openFields[field.id] ?? false
                   return (
@@ -492,7 +529,7 @@ export default function FormBuilderV2Page() {
                               {TYPE_LABELS[field.type]}
                             </Badge>
                           </div>
-                          <div className="flex items-center gap-1">
+                          <div className="flex items-center gap-3">
                             <div className="flex items-center gap-2 text-sm">
                               <Switch
                                 checked={field.required}
@@ -533,6 +570,17 @@ export default function FormBuilderV2Page() {
                               />
                             </div>
                             <div className="space-y-2">
+                              <Label className="text-xs text-muted-foreground">字段 Key</Label>
+                              <Input
+                                value={field.key}
+                                onChange={(e) =>
+                                  updateField(field.id, {
+                                    key: e.target.value.replace(/[^a-zA-Z0-9_]/g, '_') || 'field',
+                                  })
+                                }
+                              />
+                            </div>
+                            <div className="space-y-2">
                               <Label className="text-xs text-muted-foreground">占位提示</Label>
                               <Input
                                 placeholder="请输入占位符"
@@ -540,6 +588,14 @@ export default function FormBuilderV2Page() {
                                 onChange={(e) =>
                                   updateField(field.id, { placeholder: e.target.value })
                                 }
+                              />
+                            </div>
+                            <div className="space-y-2 sm:col-span-2">
+                              <Label className="text-xs text-muted-foreground">字段描述</Label>
+                              <textarea
+                                className="h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                                value={field.description ?? ''}
+                                onChange={(e) => updateField(field.id, { description: e.target.value })}
                               />
                             </div>
                             {field.type === 'select' && (
