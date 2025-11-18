@@ -5,12 +5,11 @@ import {
   getTemplate,
   labelValue,
   RJSFSchema,
-  schemaRequiresTrueValue,
   StrictRJSFSchema,
   WidgetProps,
 } from '@rjsf/utils';
-import { Checkbox } from '../components/ui/checkbox';
 import { Label } from '../components/ui/label';
+import { Switch } from '@/components/ui/switch';
 
 /** The `CheckBoxWidget` is a widget for rendering boolean properties.
  *  It is typically used to represent a boolean.
@@ -24,7 +23,6 @@ export default function CheckboxWidget<
 >(props: WidgetProps<T, S, F>) {
   const {
     id,
-    htmlName,
     value,
     disabled,
     readonly,
@@ -40,10 +38,6 @@ export default function CheckboxWidget<
     uiSchema,
     className,
   } = props;
-  // Because an unchecked checkbox will cause html5 validation to fail, only add
-  // the "required" attribute if the field value must be "true", due to the
-  // "const" or "enum" keywords
-  const required = schemaRequiresTrueValue<S>(schema);
   const DescriptionFieldTemplate = getTemplate<'DescriptionFieldTemplate', T, S, F>(
     'DescriptionFieldTemplate',
     registry,
@@ -70,11 +64,9 @@ export default function CheckboxWidget<
         />
       )}
       <div className='flex items-center gap-2 my-2'>
-        <Checkbox
+        <Switch
           id={id}
-          name={htmlName || id}
           checked={typeof value === 'undefined' ? false : Boolean(value)}
-          required={required}
           disabled={disabled || readonly}
           autoFocus={autofocus}
           onCheckedChange={_onChange}

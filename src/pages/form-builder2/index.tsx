@@ -443,6 +443,12 @@ export default function FormBuilderV2Page() {
 
           <div className="space-y-6">
             <Card>
+              <CardHeader className="space-y-2">
+                <CardTitle>字段画布</CardTitle>
+                <CardDescription>
+                  调整标签、占位、必填与选项，自动生成 schema 与 uiSchema
+                </CardDescription>
+              </CardHeader>
               <CardContent
                 className="space-y-4"
                 onDragOver={(event) => {
@@ -595,7 +601,9 @@ export default function FormBuilderV2Page() {
                               <textarea
                                 className="h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                                 value={field.description ?? ''}
-                                onChange={(e) => updateField(field.id, { description: e.target.value })}
+                                onChange={(e) =>
+                                  updateField(field.id, { description: e.target.value })
+                                }
                               />
                             </div>
                             {field.type === 'select' && (
