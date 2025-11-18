@@ -437,64 +437,7 @@ export default function FormBuilderV2Page() {
           </CardHeader>
         </Card>
 
-        <div className="grid gap-6 lg:grid-cols-[280px_minmax(0,1.1fr)_minmax(0,0.9fr)]">
-          <div className="space-y-6 lg:sticky lg:top-4 self-start">
-            <Card className="border-dashed border-primary/30 bg-card/70">
-              <CardHeader className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-                <div>
-                  <CardTitle className="text-base">快速添加</CardTitle>
-                  <CardDescription className="text-xs">
-                    拖拽或点击左侧控件，快速补充常用字段
-                  </CardDescription>
-                </div>
-                <Badge variant="secondary" className="gap-1">
-                  <ListPlus className="h-3.5 w-3.5" />
-                  {Object.keys(TYPE_LABELS).length} 种常用控件
-                </Badge>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                {(
-                  [
-                    'text',
-                    'textarea',
-                    'number',
-                    'select',
-                    'multi-select',
-                    'switch',
-                    'date',
-                  ] as FieldType[]
-                ).map((type) => (
-                  <button
-                    key={type}
-                    type="button"
-                    draggable
-                    onDragStart={(event) => {
-                      event.dataTransfer.effectAllowed = 'copy'
-                      setDraggingType(type)
-                    }}
-                    onDragEnd={() => setDraggingType(null)}
-                    onClick={() => handleAddField(type)}
-                    className="flex w-full flex-col gap-1.5 rounded-lg border border-muted bg-muted/60 px-3 py-2 text-left transition hover:border-primary hover:bg-primary/5"
-                  >
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm font-medium">{TYPE_LABELS[type]}</p>
-                      <Plus className="h-4 w-4 text-primary" />
-                    </div>
-                    <p className="text-[13px] text-muted-foreground leading-tight">
-                      {type === 'text' && '单行输入，支持占位与必填'}
-                      {type === 'textarea' && '多行内容，适合描述'}
-                      {type === 'number' && '数量、排序或金额'}
-                      {type === 'select' && '下拉选项，可配置枚举'}
-                      {type === 'multi-select' && '多项选择，支持回显多个值'}
-                      {type === 'switch' && '布尔/状态切换'}
-                      {type === 'date' && '日期选择器'}
-                    </p>
-                  </button>
-                ))}
-              </CardContent>
-            </Card>
-          </div>
-
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.9fr)]">
           <div className="space-y-6">
             <Card>
               <CardHeader className="space-y-2">
@@ -504,7 +447,7 @@ export default function FormBuilderV2Page() {
                 </CardDescription>
               </CardHeader>
               <CardContent
-                className="space-y-4"
+                className="space-y-6"
                 onDragOver={(event) => {
                   event.preventDefault()
                   event.dataTransfer.dropEffect = draggingType ? 'copy' : 'move'
@@ -516,220 +459,295 @@ export default function FormBuilderV2Page() {
                   }
                 }}
               >
-                <div className="rounded-lg border border-dashed border-primary/30 bg-muted/20 p-4">
-                  <p className="text-sm font-medium">字段配置</p>
-                  <p className="text-xs text-muted-foreground">
-                    设置字段 Key、描述与类型，创建后可在下方继续调整。
-                  </p>
-                  <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                    <Input
-                      placeholder="字段标签，如：审批备注"
-                      value={newLabel}
-                      onChange={(e) => setNewLabel(e.target.value)}
-                    />
-                    <Input
-                      placeholder="字段 key，例如 owner_email"
-                      value={newFieldKey}
-                      onChange={(e) => setNewFieldKey(e.target.value.replace(/\s+/g, '_'))}
-                    />
-                    <Select
-                      onValueChange={(value) => setNewFieldType(value as FieldType)}
-                      value={newFieldType}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="字段类型" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {(Object.keys(TYPE_LABELS) as FieldType[]).map((type) => (
-                          <SelectItem key={type} value={type}>
-                            {TYPE_LABELS[type]}
-                          </SelectItem>
+                <div className="grid gap-4 lg:grid-cols-[240px_minmax(0,1fr)]">
+                  <div className="space-y-4">
+                    <div className="rounded-lg border border-dashed border-primary/30 bg-muted/30 p-4 shadow-sm h-full">
+                      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                        <div>
+                          <p className="text-sm font-medium">快速添加</p>
+                          <p className="text-xs text-muted-foreground">
+                            拖拽或点击控件，快速补充常用字段
+                          </p>
+                        </div>
+                        <Badge variant="secondary" className="gap-1 self-start md:self-auto">
+                          <ListPlus className="h-3.5 w-3.5" />
+                          {Object.keys(TYPE_LABELS).length} 种常用控件
+                        </Badge>
+                      </div>
+                      <div className="mt-4 grid gap-2">
+                        {(
+                          [
+                            'text',
+                            'textarea',
+                            'number',
+                            'select',
+                            'multi-select',
+                            'switch',
+                            'date',
+                          ] as FieldType[]
+                        ).map((type) => (
+                          <button
+                            key={type}
+                            type="button"
+                            draggable
+                            onDragStart={(event) => {
+                              event.dataTransfer.effectAllowed = 'copy'
+                              setDraggingType(type)
+                            }}
+                            onDragEnd={() => setDraggingType(null)}
+                            onClick={() => handleAddField(type)}
+                            className="flex w-full flex-col gap-1.5 rounded-lg border border-muted bg-muted/60 px-3 py-2 text-left transition hover:border-primary hover:bg-primary/5"
+                          >
+                            <div className="flex items-center justify-between">
+                              <p className="text-sm font-medium">{TYPE_LABELS[type]}</p>
+                              <Plus className="h-4 w-4 text-primary" />
+                            </div>
+                            <p className="text-[13px] text-muted-foreground leading-tight">
+                              {type === 'text' && '单行输入，支持占位与必填'}
+                              {type === 'textarea' && '多行内容，适合描述'}
+                              {type === 'number' && '数量、排序或金额'}
+                              {type === 'select' && '下拉选项，可配置枚举'}
+                              {type === 'multi-select' && '多项选择，支持回显多个值'}
+                              {type === 'switch' && '布尔/状态切换'}
+                              {type === 'date' && '日期选择器'}
+                            </p>
+                          </button>
                         ))}
-                      </SelectContent>
-                    </Select>
-                    <Button type="button" className="gap-1" onClick={handleCustomAdd}>
-                      <Wand2 className="h-4 w-4" />
-                      插入字段
-                    </Button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="rounded-lg border border-dashed border-primary/30 bg-muted/20 p-4">
+                      <p className="text-sm font-medium">字段配置</p>
+                      <p className="text-xs text-muted-foreground">
+                        设置字段 Key、描述与类型，创建后可在下方继续调整。
+                      </p>
+                      <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                        <Input
+                          placeholder="字段标签，如：审批备注"
+                          value={newLabel}
+                          onChange={(e) => setNewLabel(e.target.value)}
+                        />
+                        <Input
+                          placeholder="字段 key，例如 owner_email"
+                          value={newFieldKey}
+                          onChange={(e) => setNewFieldKey(e.target.value.replace(/\s+/g, '_'))}
+                        />
+                        <Select
+                          onValueChange={(value) => setNewFieldType(value as FieldType)}
+                          value={newFieldType}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="字段类型" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {(Object.keys(TYPE_LABELS) as FieldType[]).map((type) => (
+                              <SelectItem key={type} value={type}>
+                                {TYPE_LABELS[type]}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <Button type="button" className="gap-1" onClick={handleCustomAdd}>
+                          <Wand2 className="h-4 w-4" />
+                          插入字段
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      {fields.map((field, index) => {
+                        const isOpen = openFields[field.id] ?? false
+                        return (
+                          <Collapsible
+                            key={field.id}
+                            open={isOpen}
+                            onOpenChange={(value) =>
+                              setOpenFields((prev) => ({ ...prev, [field.id]: value }))
+                            }
+                          >
+                            <div
+                              draggable
+                              onDragStart={(event) => {
+                                event.dataTransfer.effectAllowed = 'move'
+                                setDraggingId(field.id)
+                              }}
+                              onDragOver={(event) => {
+                                event.preventDefault()
+                                event.dataTransfer.dropEffect = draggingId ? 'move' : 'none'
+                              }}
+                              onDrop={(event) => {
+                                event.preventDefault()
+                                handleReorderDrop(field.id)
+                              }}
+                              onDragEnd={() => setDraggingId(null)}
+                              className="rounded-lg border bg-card/60 p-4 shadow-sm transition hover:border-primary/50"
+                            >
+                              <div className="flex flex-wrap items-center justify-between gap-3">
+                                <div className="flex items-center gap-2 text-sm font-medium">
+                                  <SquarePen className="h-4 w-4 text-primary" />
+                                  {field.label}
+                                  <Badge variant="outline" className="text-xs">
+                                    {TYPE_LABELS[field.type]}
+                                  </Badge>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                  <div className="flex items-center gap-2 text-sm">
+                                    <Switch
+                                      size="sm"
+                                      checked={field.required}
+                                      onCheckedChange={(value) =>
+                                        updateField(field.id, { required: value })
+                                      }
+                                    />
+                                    <span className="text-muted-foreground">必填</span>
+                                  </div>
+                                  <CollapsibleTrigger asChild>
+                                    <Button variant="ghost" size="icon" aria-label="折叠字段">
+                                      <ChevronDown
+                                        className={cn(
+                                          'h-4 w-4 transition',
+                                          isOpen ? 'rotate-0' : '-rotate-90'
+                                        )}
+                                      />
+                                    </Button>
+                                  </CollapsibleTrigger>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    aria-label="删除字段"
+                                    onClick={() => removeField(field.id)}
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </div>
+                              <CollapsibleContent>
+                                <Separator className="my-3" />
+                                <div className="grid gap-3 sm:grid-cols-2">
+                                  <div className="space-y-2">
+                                    <Label className="text-xs text-muted-foreground">
+                                      字段标题
+                                    </Label>
+                                    <Input
+                                      value={field.label}
+                                      onChange={(e) =>
+                                        updateField(field.id, { label: e.target.value })
+                                      }
+                                    />
+                                  </div>
+                                  <div className="space-y-2">
+                                    <Label className="text-xs text-muted-foreground">
+                                      字段 Key
+                                    </Label>
+                                    <Input
+                                      value={field.key}
+                                      onChange={(e) =>
+                                        updateField(field.id, {
+                                          key:
+                                            e.target.value.replace(/[^a-zA-Z0-9_]/g, '_') ||
+                                            'field',
+                                        })
+                                      }
+                                    />
+                                  </div>
+                                  <div className="space-y-2 sm:col-span-2">
+                                    <Label className="text-xs text-muted-foreground">
+                                      占位提示
+                                    </Label>
+                                    <Input
+                                      placeholder="请输入占位符"
+                                      value={field.placeholder ?? ''}
+                                      onChange={(e) =>
+                                        updateField(field.id, { placeholder: e.target.value })
+                                      }
+                                    />
+                                  </div>
+                                  <div className="space-y-2 sm:col-span-2">
+                                    <Label className="text-xs text-muted-foreground">
+                                      字段描述
+                                    </Label>
+                                    <Textarea
+                                      value={field.description ?? ''}
+                                      onChange={(e) =>
+                                        updateField(field.id, { description: e.target.value })
+                                      }
+                                    />
+                                  </div>
+                                  {(field.type === 'select' || field.type === 'multi-select') && (
+                                    <div className="space-y-2 sm:col-span-2">
+                                      <Label className="text-xs text-muted-foreground">
+                                        选项（每行一个）
+                                      </Label>
+                                      <Textarea
+                                        className="h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                                        value={(field.options || []).join('\n')}
+                                        onChange={(e) =>
+                                          updateField(field.id, {
+                                            options: e.target.value
+                                              .split('\n')
+                                              .map((item) => item.trim())
+                                              .filter(Boolean),
+                                          })
+                                        }
+                                      />
+                                    </div>
+                                  )}
+                                  <div className="space-y-2 sm:col-span-2">
+                                    <Label className="text-xs text-muted-foreground">默认值</Label>
+                                    {field.type === 'switch' ? (
+                                      <div className="flex h-10 items-center gap-3 rounded-md border border-input px-3">
+                                        <Switch
+                                          checked={Boolean(field.defaultValue)}
+                                          onCheckedChange={(value) =>
+                                            updateField(field.id, { defaultValue: value })
+                                          }
+                                        />
+                                        <span className="text-sm text-muted-foreground">
+                                          {field.defaultValue ? '已开启' : '已关闭'}
+                                        </span>
+                                      </div>
+                                    ) : field.type === 'multi-select' ? (
+                                      <Textarea
+                                        placeholder="填写默认选中的值（每行一个），需与选项一致"
+                                        value={
+                                          Array.isArray(field.defaultValue)
+                                            ? field.defaultValue.join('\n')
+                                            : ''
+                                        }
+                                        onChange={(e) =>
+                                          updateField(field.id, {
+                                            defaultValue: e.target.value
+                                              .split('\n')
+                                              .map((item) => item.trim())
+                                              .filter(Boolean),
+                                          })
+                                        }
+                                      />
+                                    ) : (
+                                      <Input
+                                        value={String(field.defaultValue ?? '')}
+                                        onChange={(e) =>
+                                          updateField(field.id, {
+                                            defaultValue:
+                                              field.type === 'number'
+                                                ? Number(e.target.value)
+                                                : e.target.value,
+                                          })
+                                        }
+                                      />
+                                    )}
+                                  </div>
+                                </div>
+                              </CollapsibleContent>
+                            </div>
+                          </Collapsible>
+                        )
+                      })}
+                    </div>
                   </div>
                 </div>
-
-                {fields.map((field, index) => {
-                  const isOpen = openFields[field.id] ?? false
-                  return (
-                    <Collapsible
-                      key={field.id}
-                      open={isOpen}
-                      onOpenChange={(value) =>
-                        setOpenFields((prev) => ({ ...prev, [field.id]: value }))
-                      }
-                    >
-                      <div
-                        draggable
-                        onDragStart={(event) => {
-                          event.dataTransfer.effectAllowed = 'move'
-                          setDraggingId(field.id)
-                        }}
-                        onDragOver={(event) => {
-                          event.preventDefault()
-                          event.dataTransfer.dropEffect = draggingId ? 'move' : 'none'
-                        }}
-                        onDrop={(event) => {
-                          event.preventDefault()
-                          handleReorderDrop(field.id)
-                        }}
-                        onDragEnd={() => setDraggingId(null)}
-                        className="rounded-lg border bg-card/60 p-4 shadow-sm transition hover:border-primary/50"
-                      >
-                        <div className="flex flex-wrap items-center justify-between gap-3">
-                          <div className="flex items-center gap-2 text-sm font-medium">
-                            <SquarePen className="h-4 w-4 text-primary" />
-                            {field.label}
-                            <Badge variant="outline" className="text-xs">
-                              {TYPE_LABELS[field.type]}
-                            </Badge>
-                          </div>
-                          <div className="flex items-center gap-3">
-                            <div className="flex items-center gap-2 text-sm">
-                              <Switch
-                                size="sm"
-                                checked={field.required}
-                                onCheckedChange={(value) =>
-                                  updateField(field.id, { required: value })
-                                }
-                              />
-                              <span className="text-muted-foreground">必填</span>
-                            </div>
-                            <CollapsibleTrigger asChild>
-                              <Button variant="ghost" size="icon" aria-label="折叠字段">
-                                <ChevronDown
-                                  className={cn(
-                                    'h-4 w-4 transition',
-                                    isOpen ? 'rotate-0' : '-rotate-90'
-                                  )}
-                                />
-                              </Button>
-                            </CollapsibleTrigger>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              aria-label="删除字段"
-                              onClick={() => removeField(field.id)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
-                        <CollapsibleContent>
-                          <Separator className="my-3" />
-                          <div className="grid gap-3 sm:grid-cols-2">
-                            <div className="space-y-2">
-                              <Label className="text-xs text-muted-foreground">字段标题</Label>
-                              <Input
-                                value={field.label}
-                                onChange={(e) => updateField(field.id, { label: e.target.value })}
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <Label className="text-xs text-muted-foreground">字段 Key</Label>
-                              <Input
-                                value={field.key}
-                                onChange={(e) =>
-                                  updateField(field.id, {
-                                    key: e.target.value.replace(/[^a-zA-Z0-9_]/g, '_') || 'field',
-                                  })
-                                }
-                              />
-                            </div>
-                            <div className="space-y-2 sm:col-span-2">
-                              <Label className="text-xs text-muted-foreground">占位提示</Label>
-                              <Input
-                                placeholder="请输入占位符"
-                                value={field.placeholder ?? ''}
-                                onChange={(e) =>
-                                  updateField(field.id, { placeholder: e.target.value })
-                                }
-                              />
-                            </div>
-                            <div className="space-y-2 sm:col-span-2">
-                              <Label className="text-xs text-muted-foreground">字段描述</Label>
-                              <Textarea
-                                value={field.description ?? ''}
-                                onChange={(e) =>
-                                  updateField(field.id, { description: e.target.value })
-                                }
-                              />
-                            </div>
-                            {(field.type === 'select' || field.type === 'multi-select') && (
-                              <div className="space-y-2 sm:col-span-2">
-                                <Label className="text-xs text-muted-foreground">
-                                  选项（每行一个）
-                                </Label>
-                                <Textarea
-                                  className="h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                                  value={(field.options || []).join('\n')}
-                                  onChange={(e) =>
-                                    updateField(field.id, {
-                                      options: e.target.value
-                                        .split('\n')
-                                        .map((item) => item.trim())
-                                        .filter(Boolean),
-                                    })
-                                  }
-                                />
-                              </div>
-                            )}
-                            <div className="space-y-2 sm:col-span-2">
-                              <Label className="text-xs text-muted-foreground">默认值</Label>
-                              {field.type === 'switch' ? (
-                                <div className="flex h-10 items-center gap-3 rounded-md border border-input px-3">
-                                  <Switch
-                                    checked={Boolean(field.defaultValue)}
-                                    onCheckedChange={(value) =>
-                                      updateField(field.id, { defaultValue: value })
-                                    }
-                                  />
-                                  <span className="text-sm text-muted-foreground">
-                                    {field.defaultValue ? '已开启' : '已关闭'}
-                                  </span>
-                                </div>
-                              ) : field.type === 'multi-select' ? (
-                                <Textarea
-                                  placeholder="填写默认选中的值（每行一个），需与选项一致"
-                                  value={
-                                    Array.isArray(field.defaultValue)
-                                      ? field.defaultValue.join('\n')
-                                      : ''
-                                  }
-                                  onChange={(e) =>
-                                    updateField(field.id, {
-                                      defaultValue: e.target.value
-                                        .split('\n')
-                                        .map((item) => item.trim())
-                                        .filter(Boolean),
-                                    })
-                                  }
-                                />
-                              ) : (
-                                <Input
-                                  value={String(field.defaultValue ?? '')}
-                                  onChange={(e) =>
-                                    updateField(field.id, {
-                                      defaultValue:
-                                        field.type === 'number'
-                                          ? Number(e.target.value)
-                                          : e.target.value,
-                                    })
-                                  }
-                                />
-                              )}
-                            </div>
-                          </div>
-                        </CollapsibleContent>
-                      </div>
-                    </Collapsible>
-                  )
-                })}
               </CardContent>
             </Card>
           </div>
