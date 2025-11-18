@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
 import {
   Select,
   SelectContent,
@@ -33,7 +34,7 @@ import {
 } from 'lucide-react'
 import { toast } from 'sonner'
 
-type FieldType = 'text' | 'textarea' | 'number' | 'select' | 'switch' | 'date'
+type FieldType = 'text' | 'textarea' | 'number' | 'select' | 'multi-select' | 'switch' | 'date'
 
 type FieldConfig = {
   id: string
@@ -43,7 +44,7 @@ type FieldConfig = {
   required?: boolean
   placeholder?: string
   options?: string[]
-  defaultValue?: string | number | boolean
+  defaultValue?: string | number | boolean | string[]
   description?: string
 }
 
@@ -99,6 +100,7 @@ const TYPE_LABELS: Record<FieldType, string> = {
   textarea: '多行文本',
   number: '数字',
   select: '下拉选择',
+  'multi-select': '多选',
   switch: '开关',
   date: '日期',
 }
@@ -134,6 +136,8 @@ const deriveDefaults = (field: FieldConfig) => {
       return false
     case 'select':
       return field.options?.[0] ?? ''
+    case 'multi-select':
+      return []
     default:
       return ''
   }
@@ -194,6 +198,29 @@ const buildArtifacts = (
         default: field.defaultValue ?? options[0],
       }
       uiSchema[key] = { 'ui:widget': 'select', 'ui:placeholder': field.placeholder }
+    } else if (field.type === 'multi-select') {
+      const options = field.options?.length ? field.options : ['A', 'B', 'C']
+      const defaultValues = Array.isArray(field.defaultValue)
+        ? field.defaultValue
+        : field.defaultValue
+        ? [String(field.defaultValue)]
+        : []
+      schema.properties![key] = {
+        type: 'array',
+        title: field.label,
+        description,
+        items: {
+          type: 'string',
+          enum: options,
+        },
+        uniqueItems: true,
+        default: defaultValues,
+      }
+      uiSchema[key] = {
+        'ui:widget': 'select',
+        'ui:placeholder': field.placeholder,
+        'ui:options': { multiple: true },
+      }
     } else if (field.type === 'switch') {
       schema.properties![key] = {
         type: 'boolean',
@@ -216,7 +243,13 @@ const buildArtifacts = (
     }
 
     const value = existingData[key] ?? deriveDefaults(field)
-    formData[key] = field.type === 'number' && typeof value === 'string' ? Number(value) : value
+    if (field.type === 'number' && typeof value === 'string') {
+      formData[key] = Number(value)
+    } else if (field.type === 'multi-select') {
+      formData[key] = Array.isArray(value) ? value : value ? [String(value)] : []
+    } else {
+      formData[key] = value
+    }
   })
 
   return { schema, uiSchema, formData }
@@ -265,8 +298,9 @@ export default function FormBuilderV2Page() {
       label: `${TYPE_LABELS[type]} ${fields.length + 1}`,
       type,
       required: type !== 'switch',
-      defaultValue: type === 'number' ? 0 : type === 'switch' ? false : '',
-      options: type === 'select' ? ['选项一', '选项二'] : undefined,
+      defaultValue:
+        type === 'number' ? 0 : type === 'switch' ? false : type === 'multi-select' ? [] : '',
+      options: type === 'select' || type === 'multi-select' ? ['选项一', '选项二'] : undefined,
     }
     setFields((prev) => [...prev, field])
     setOpenFields((prev) => ({ ...prev, [field.id]: false }))
@@ -286,8 +320,18 @@ export default function FormBuilderV2Page() {
       type: newFieldType,
       required: true,
       description: '',
-      defaultValue: newFieldType === 'number' ? 0 : newFieldType === 'switch' ? false : '',
-      options: newFieldType === 'select' ? ['选项一', '选项二'] : undefined,
+      defaultValue:
+        newFieldType === 'number'
+          ? 0
+          : newFieldType === 'switch'
+          ? false
+          : newFieldType === 'multi-select'
+          ? []
+          : '',
+      options:
+        newFieldType === 'select' || newFieldType === 'multi-select'
+          ? ['选项一', '选项二']
+          : undefined,
     }
     setFields((prev) => [...prev, field])
     setOpenFields((prev) => ({ ...prev, [field.id]: false }))
@@ -404,39 +448,49 @@ export default function FormBuilderV2Page() {
                   </CardDescription>
                 </div>
                 <Badge variant="secondary" className="gap-1">
-                  <ListPlus className="h-3.5 w-3.5" />6 种常用控件
+                  <ListPlus className="h-3.5 w-3.5" />
+                  {Object.keys(TYPE_LABELS).length} 种常用控件
                 </Badge>
               </CardHeader>
               <CardContent className="space-y-2">
-                {(['text', 'textarea', 'number', 'select', 'switch', 'date'] as FieldType[]).map(
-                  (type) => (
-                    <button
-                      key={type}
-                      type="button"
-                      draggable
-                      onDragStart={(event) => {
-                        event.dataTransfer.effectAllowed = 'copy'
-                        setDraggingType(type)
-                      }}
-                      onDragEnd={() => setDraggingType(null)}
-                      onClick={() => handleAddField(type)}
-                      className="flex w-full flex-col gap-1.5 rounded-lg border border-muted bg-muted/60 px-3 py-2 text-left transition hover:border-primary hover:bg-primary/5"
-                    >
-                      <div className="flex items-center justify-between">
-                        <p className="text-sm font-medium">{TYPE_LABELS[type]}</p>
-                        <Plus className="h-4 w-4 text-primary" />
-                      </div>
-                      <p className="text-[13px] text-muted-foreground leading-tight">
-                        {type === 'text' && '单行输入，支持占位与必填'}
-                        {type === 'textarea' && '多行内容，适合描述'}
-                        {type === 'number' && '数量、排序或金额'}
-                        {type === 'select' && '下拉选项，可配置枚举'}
-                        {type === 'switch' && '布尔/状态切换'}
-                        {type === 'date' && '日期选择器'}
-                      </p>
-                    </button>
-                  )
-                )}
+                {(
+                  [
+                    'text',
+                    'textarea',
+                    'number',
+                    'select',
+                    'multi-select',
+                    'switch',
+                    'date',
+                  ] as FieldType[]
+                ).map((type) => (
+                  <button
+                    key={type}
+                    type="button"
+                    draggable
+                    onDragStart={(event) => {
+                      event.dataTransfer.effectAllowed = 'copy'
+                      setDraggingType(type)
+                    }}
+                    onDragEnd={() => setDraggingType(null)}
+                    onClick={() => handleAddField(type)}
+                    className="flex w-full flex-col gap-1.5 rounded-lg border border-muted bg-muted/60 px-3 py-2 text-left transition hover:border-primary hover:bg-primary/5"
+                  >
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-medium">{TYPE_LABELS[type]}</p>
+                      <Plus className="h-4 w-4 text-primary" />
+                    </div>
+                    <p className="text-[13px] text-muted-foreground leading-tight">
+                      {type === 'text' && '单行输入，支持占位与必填'}
+                      {type === 'textarea' && '多行内容，适合描述'}
+                      {type === 'number' && '数量、排序或金额'}
+                      {type === 'select' && '下拉选项，可配置枚举'}
+                      {type === 'multi-select' && '多项选择，支持回显多个值'}
+                      {type === 'switch' && '布尔/状态切换'}
+                      {type === 'date' && '日期选择器'}
+                    </p>
+                  </button>
+                ))}
               </CardContent>
             </Card>
           </div>
@@ -586,7 +640,7 @@ export default function FormBuilderV2Page() {
                                 }
                               />
                             </div>
-                            <div className="space-y-2">
+                            <div className="space-y-2 sm:col-span-2">
                               <Label className="text-xs text-muted-foreground">占位提示</Label>
                               <Input
                                 placeholder="请输入占位符"
@@ -598,20 +652,19 @@ export default function FormBuilderV2Page() {
                             </div>
                             <div className="space-y-2 sm:col-span-2">
                               <Label className="text-xs text-muted-foreground">字段描述</Label>
-                              <textarea
-                                className="h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                              <Textarea
                                 value={field.description ?? ''}
                                 onChange={(e) =>
                                   updateField(field.id, { description: e.target.value })
                                 }
                               />
                             </div>
-                            {field.type === 'select' && (
+                            {(field.type === 'select' || field.type === 'multi-select') && (
                               <div className="space-y-2 sm:col-span-2">
                                 <Label className="text-xs text-muted-foreground">
                                   选项（每行一个）
                                 </Label>
-                                <textarea
+                                <Textarea
                                   className="h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                                   value={(field.options || []).join('\n')}
                                   onChange={(e) =>
@@ -625,7 +678,7 @@ export default function FormBuilderV2Page() {
                                 />
                               </div>
                             )}
-                            <div className="space-y-2">
+                            <div className="space-y-2 sm:col-span-2">
                               <Label className="text-xs text-muted-foreground">默认值</Label>
                               {field.type === 'switch' ? (
                                 <div className="flex h-10 items-center gap-3 rounded-md border border-input px-3">
@@ -639,6 +692,23 @@ export default function FormBuilderV2Page() {
                                     {field.defaultValue ? '已开启' : '已关闭'}
                                   </span>
                                 </div>
+                              ) : field.type === 'multi-select' ? (
+                                <Textarea
+                                  placeholder="填写默认选中的值（每行一个），需与选项一致"
+                                  value={
+                                    Array.isArray(field.defaultValue)
+                                      ? field.defaultValue.join('\n')
+                                      : ''
+                                  }
+                                  onChange={(e) =>
+                                    updateField(field.id, {
+                                      defaultValue: e.target.value
+                                        .split('\n')
+                                        .map((item) => item.trim())
+                                        .filter(Boolean),
+                                    })
+                                  }
+                                />
                               ) : (
                                 <Input
                                   value={String(field.defaultValue ?? '')}
@@ -722,7 +792,7 @@ export default function FormBuilderV2Page() {
               </CardContent>
             </Card>
 
-            <Card>
+            {/* <Card>
               <CardHeader>
                 <CardTitle>使用技巧</CardTitle>
                 <CardDescription>这些约定能让 schema 更易维护与复用</CardDescription>
@@ -747,7 +817,7 @@ export default function FormBuilderV2Page() {
                   </p>
                 </div>
               </CardContent>
-            </Card>
+            </Card> */}
           </div>
         </div>
       </div>
