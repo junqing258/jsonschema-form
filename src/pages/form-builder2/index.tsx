@@ -592,6 +592,7 @@ export default function FormBuilderV2Page() {
                           <div className="flex items-center gap-3">
                             <div className="flex items-center gap-2 text-sm">
                               <Switch
+                                size="sm"
                                 checked={field.required}
                                 onCheckedChange={(value) =>
                                   updateField(field.id, { required: value })
@@ -764,7 +765,6 @@ export default function FormBuilderV2Page() {
                         validator={validator}
                         id="form-builder"
                         className="space-y-10"
-                        // liveValidate={liveValidate}
                         showErrorList={false}
                         onChange={(event) => setFormData(event.formData as Record<string, unknown>)}
                         onSubmit={(event) => {
