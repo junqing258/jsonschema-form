@@ -14,7 +14,7 @@ export default defineConfig((args) => {
   }[mode] || ''
 
   return {
-    base: command === 'build' ? uploadUrl : '/view',
+    base: command === 'build' ? uploadUrl : '/',
     plugins: [
       codeInspectorPlugin({ bundler: 'vite' }),
       react(),

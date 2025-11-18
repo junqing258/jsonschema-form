@@ -1,6 +1,4 @@
-import Form from '@rjsf/shadcn'
 import { RJSFSchema, UiSchema } from '@rjsf/utils'
-import validator from '@rjsf/validator-ajv8'
 
 export default function HomePage() {
   const schema: RJSFSchema = {
@@ -85,13 +83,7 @@ export default function HomePage() {
 
   return (
     <div className="p-4">
-      <Form
-        className="max-w-6xl mx-auto"
-        schema={schema}
-        validator={validator}
-        uiSchema={uiSchema}
-        formData={formData}
-      />
+      <h1>Home Page</h1>
     </div>
   )
 }
