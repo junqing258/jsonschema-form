@@ -483,14 +483,14 @@ export default function FormBuilderV2Page() {
                       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                         <div>
                           <p className="text-sm font-medium">快速添加</p>
-                          <p className="text-xs text-muted-foreground">
+                          {/* <p className="text-xs text-muted-foreground">
                             拖拽或点击控件，快速补充常用字段
-                          </p>
+                          </p> */}
                         </div>
-                        <Badge variant="secondary" className="gap-1 self-start md:self-auto">
+                        {/* <Badge variant="secondary" className="gap-1 self-start md:self-auto">
                           <ListPlus className="h-3.5 w-3.5" />
                           {Object.keys(TYPE_LABELS).length} 种常用控件
-                        </Badge>
+                        </Badge> */}
                       </div>
                       <div className="mt-4 grid gap-2">
                         {(
@@ -521,7 +521,7 @@ export default function FormBuilderV2Page() {
                               <p className="text-sm font-medium">{TYPE_LABELS[type]}</p>
                               <Plus className="h-4 w-4 text-primary" />
                             </div>
-                            <p className="text-[13px] text-muted-foreground leading-tight">
+                            {/* <p className="text-[13px] text-muted-foreground leading-tight">
                               {type === 'text' && '单行输入，支持占位与必填'}
                               {type === 'textarea' && '多行内容，适合描述'}
                               {type === 'number' && '数量、排序或金额'}
@@ -530,7 +530,7 @@ export default function FormBuilderV2Page() {
                               {type === 'switch' && '布尔/状态切换'}
                               {type === 'date' && '日期选择器'}
                               {type === 'time' && '时间选择器，支持时分输入'}
-                            </p>
+                            </p> */}
                           </button>
                         ))}
                       </div>
@@ -538,7 +538,7 @@ export default function FormBuilderV2Page() {
                   </div>
 
                   <div className="space-y-4">
-                    <div className="rounded-lg border border-dashed border-primary/30 bg-muted/20 p-4">
+                    <div className="hidden rounded-lg border border-dashed border-primary/30 bg-muted/20 p-4">
                       <p className="text-sm font-medium">字段配置</p>
                       <p className="text-xs text-muted-foreground">
                         设置字段 Key、描述与类型，创建后可在下方继续调整。
