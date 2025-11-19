@@ -34,7 +34,15 @@ import {
 } from 'lucide-react'
 import { toast } from 'sonner'
 
-type FieldType = 'text' | 'textarea' | 'number' | 'select' | 'multi-select' | 'switch' | 'date'
+type FieldType =
+  | 'text'
+  | 'textarea'
+  | 'number'
+  | 'select'
+  | 'multi-select'
+  | 'switch'
+  | 'date'
+  | 'time'
 
 type FieldConfig = {
   id: string
@@ -103,6 +111,7 @@ const TYPE_LABELS: Record<FieldType, string> = {
   'multi-select': '多选',
   switch: '开关',
   date: '日期',
+  time: '时间',
 }
 
 const copyToClipboard = async (value: string, label: string) => {
@@ -228,15 +237,24 @@ const buildArtifacts = (
         description,
         default: Boolean(field.defaultValue),
       }
-    } else if (field.type === 'date') {
+    } else if (field.type === 'date' || field.type === 'time') {
       schema.properties![key] = {
         type: 'string',
-        format: 'date',
+        format: field.type === 'date' ? 'date' : 'time',
         title: field.label,
         description,
         default: field.defaultValue ?? '',
       }
-    }
+    } /* else if (field.type === 'time') {
+      schema.properties![key] = {
+        type: 'string',
+        format: 'time',
+        title: field.label,
+        description,
+        default: field.defaultValue ?? '',
+      }
+      uiSchema[key] = { 'ui:widget': 'time' }
+    } */
 
     if (field.required) {
       schema.required?.push(key)
@@ -484,6 +502,7 @@ export default function FormBuilderV2Page() {
                             'multi-select',
                             'switch',
                             'date',
+                            'time',
                           ] as FieldType[]
                         ).map((type) => (
                           <button
@@ -510,6 +529,7 @@ export default function FormBuilderV2Page() {
                               {type === 'multi-select' && '多项选择，支持回显多个值'}
                               {type === 'switch' && '布尔/状态切换'}
                               {type === 'date' && '日期选择器'}
+                              {type === 'time' && '时间选择器，支持时分输入'}
                             </p>
                           </button>
                         ))}
@@ -775,7 +795,7 @@ export default function FormBuilderV2Page() {
                     </TabsTrigger>
                   </TabsList>
                   <TabsContent value="form">
-                    <div className="rounded-lg border bg-background p-4">
+                    <div className="rounded-lg bg-background p-0">
                       <Form
                         schema={schema}
                         uiSchema={uiSchema}
