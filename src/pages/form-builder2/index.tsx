@@ -795,7 +795,7 @@ export default function FormBuilderV2Page() {
                     </TabsTrigger>
                   </TabsList>
                   <TabsContent value="form">
-                    <div className="rounded-lg bg-background p-0">
+                    <div className="p-4 border rounded-lg shadow-md">
                       <Form
                         schema={schema}
                         uiSchema={uiSchema}
